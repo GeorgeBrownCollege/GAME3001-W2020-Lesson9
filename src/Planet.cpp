@@ -1,8 +1,7 @@
 #include "Planet.h"
 #include "Game.h"
 
-Planet::Planet():
-	m_currentTile(NULL)
+Planet::Planet()
 {
 	TheTextureManager::Instance()->load("../Assets/textures/planet.png",
 		"planet", TheGame::Instance()->getRenderer());
@@ -34,16 +33,5 @@ void Planet::update()
 
 void Planet::clean()
 {
-	delete m_currentTile;
-	m_currentTile = NULL;
-}
 
-Tile * Planet::getTile()
-{
-	return m_currentTile;
-}
-
-void Planet::setTile(Tile * newTile)
-{
-	m_currentTile = newTile;
 }

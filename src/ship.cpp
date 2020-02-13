@@ -7,7 +7,7 @@
 
 
 Ship::Ship() :
-	m_maxSpeed(5.0f), m_currentDirection(0.0f), m_turnSpeed(2.0f), m_steerForce(0.1f), m_currentTile(NULL)
+	m_maxSpeed(5.0f), m_currentDirection(0.0f), m_turnSpeed(2.0f), m_steerForce(0.1f)
 {
 	TheTextureManager::Instance()->load("../Assets/textures/ship3.png",
 		"ship", TheGame::Instance()->getRenderer());
@@ -64,8 +64,6 @@ void Ship::update()
 
 void Ship::clean()
 {
-	delete m_currentTile;
-	m_currentTile = NULL;
 }
 
 void Ship::turnRight()
@@ -99,16 +97,6 @@ void Ship::move()
 	}
 	
 
-}
-
-Tile * Ship::getTile()
-{
-	return m_currentTile;
-}
-
-void Ship::setTile(Tile* newTile)
-{
-	m_currentTile = newTile;
 }
 
 glm::vec2 Ship::getTarget()

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "TileComparators.h"
 #include <iomanip>
+#include "Util.h"
 
 
 // Pathfinding & Steering functions ***********************************************
@@ -23,10 +24,55 @@ void PlayScene::m_buildGrid()
 			auto tile = new Tile(glm::vec2(offset + size * col, offset + size * row), 
 				glm::vec2(col, row));
 			addChild(tile);
+			tile->setTileState(UNDEFINED);
 			m_pGrid.push_back(tile);
 		}
 	}
 }
+
+int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
+{
+	Tile* randomTile = nullptr;
+	int randomTileIndex = 0;
+	do
+	{
+		randomTileIndex = int(Util::RandomRange(0, m_pGrid.size() - 1));
+		randomTile = m_pGrid[randomTileIndex];
+	} while (randomTile->getTileState() != UNDEFINED); // search for empty tile
+
+
+	if (object->getTile() != nullptr)
+	{
+		object->getTile()->setTileState(UNDEFINED);
+	}
+
+	object->setPosition(randomTile->getPosition());
+	object->setTile(randomTile);
+
+	return randomTileIndex;
+}
+
+void PlayScene::m_spawnShip()
+{
+	const auto randomTileIndex = m_spawnObject(m_pShip);
+	m_pGrid[randomTileIndex]->setTileState(START);
+}
+
+void PlayScene::m_spawnPlanet()
+{
+	const auto randomTileIndex = m_spawnObject(m_pPlanet);
+	m_pGrid[randomTileIndex]->setTileState(GOAL);
+	m_computeTileValues();
+}
+
+void PlayScene::m_computeTileValues()
+{
+	for (auto tile : m_pGrid)
+	{
+		tile->setTargetDistance(m_pPlanet->getPosition());
+	}
+}
+
 
 // ImGui functions ***********************************************
 
@@ -154,16 +200,16 @@ void PlayScene::m_updateUI()
 	}
 
 	/*************************************************************************************************/
-	if (ImGui::Button("Button"))
+	if (ImGui::Button("Respawn Ship"))
 	{
-		
+		m_spawnShip();
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Another Button"))
+	if (ImGui::Button("Respawn Planet"))
 	{
-
+		m_spawnPlanet();
 	}
 
 	ImGui::SameLine();
@@ -208,11 +254,17 @@ void PlayScene::start()
 {
 	m_buildGrid();
 
+	// instantiate planet and add it to the DisplayList
+	m_pPlanet = new Planet();
+	addChild(m_pPlanet);
+
+	m_spawnPlanet();
 	
 	// instantiate ship and add it to the DisplayList
 	m_pShip = new Ship();
-	m_pShip->setPosition(glm::vec2(400.0f, 200.0f));
 	addChild(m_pShip);
+
+	m_spawnShip();
 }
 
 PlayScene::PlayScene()
@@ -233,6 +285,8 @@ void PlayScene::draw()
 			tile->draw();
 		}
 	}
+
+	m_pPlanet->draw();
 	
 	m_pShip->draw();
 	
@@ -310,10 +364,10 @@ void PlayScene::handleEvents()
 				
 				break;
 			case SDLK_m:
-				
+				m_spawnShip();
 				break;
 			case SDLK_p:
-				
+				m_spawnPlanet();
 				break;
 			case SDLK_r:
 				m_resetAll();

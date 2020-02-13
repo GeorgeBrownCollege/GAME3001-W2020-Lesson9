@@ -64,15 +64,6 @@ public:
 
 	void setTileStateLabel(std::string closedOpen);
 
-	float* getManhanttanFactor();
-	void setManhanttanFactor(float newFactor);
-
-	float* getEuclideanFactor();
-	void setEuclideanFactor(float newFactor);
-
-	float* getMineFactor();
-	void setMineFactor(float newFactor);
-
 private:
 	float m_cost = Config::TILE_COST;
 	float m_targetDist = 0.0f;
@@ -83,12 +74,6 @@ private:
 	Label* m_pClosedOpenLabel;
 
 	glm::vec2 m_goalLocation;
-	
-	static float m_manhanttanFactor;
-	static float m_euclideanFactor;
-	static float m_mineFactor;
-
-	//Tile* m_pNeighbours[4];
 
 	std::vector<Tile*> m_pNeighbours;
 };

@@ -7,6 +7,7 @@
 // Game Objects
 #include "ship.h"
 #include "Tile.h"
+#include "Planet.h"
 
 
 #include <memory>
@@ -27,11 +28,18 @@ public:
 private:
 	// GameObjects
 	Ship* m_pShip;
+	Planet* m_pPlanet;
 
 	// Tile & Grid members
 	std::vector<Tile*> m_pGrid;
 
 	void m_buildGrid();
+
+	int m_spawnObject(PathFindingDisplayObject* object);
+	void m_spawnShip();
+	void m_spawnPlanet();
+
+	void m_computeTileValues();
 
 	glm::vec2 m_mousePosition;
 

@@ -2,14 +2,14 @@
 #ifndef __Planet__
 #define __Planet__
 
-#include "DisplayObject.h"
+#include "PathFindingDisplayObject.h"
 #include "TextureManager.h"
 #include "SoundManager.h"
 #include "Tile.h"
 #include "Scene.h"
 
 
-class Planet : public DisplayObject
+class Planet : public PathFindingDisplayObject
 {
 public:
 	Planet();
@@ -22,12 +22,7 @@ public:
 
 	virtual void clean() override;
 
-	// pathfinding behaviours
-	Tile* getTile();
-	void setTile(Tile* newTile);
-
 private:
-	Tile* m_currentTile;
 };
 
 

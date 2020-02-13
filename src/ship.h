@@ -4,14 +4,13 @@
 
 #include <vector>
 
-#include "DisplayObject.h"
+#include "PathFindingDisplayObject.h"
 #include "TextureManager.h"
 #include "SoundManager.h"
 #include "Tile.h"
 #include "Scene.h"
 
-class Ship :
-	public DisplayObject
+class Ship : public PathFindingDisplayObject
 {
 public:
 	Ship();
@@ -27,10 +26,6 @@ public:
 	void turnRight();
 	void turnLeft();
 	void move();
-
-	// pathfinding behaviours
-	Tile* getTile();
-	void setTile(Tile* newTile);
 
 	glm::vec2 getTarget();
 	void setTarget(glm::vec2 position);
@@ -49,8 +44,6 @@ private:
 	float m_turnSpeed;
 	float m_steerForce;
 	glm::vec2 m_target;
-
-	Tile* m_currentTile;
 };
 
 

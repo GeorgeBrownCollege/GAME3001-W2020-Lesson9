@@ -4,10 +4,6 @@
 #include <iomanip>
 #include <sstream>
 
-float Tile::m_manhanttanFactor = 1.0f;
-float Tile::m_euclideanFactor = 0.3f;
-float Tile::m_mineFactor = 0.1f;
-
 Tile::Tile(glm::vec2 worldPosition, glm::vec2 gridPosition):
 	m_gridPosition(gridPosition)
 {
@@ -18,7 +14,6 @@ Tile::Tile(glm::vec2 worldPosition, glm::vec2 gridPosition):
 	setWidth(size.x);
 	setHeight(size.y);
 	setPosition(worldPosition);
-	setTileState(TileState::OPEN);
 
 	std::ostringstream tempLabel;
 	tempLabel << std::fixed << std::setprecision(1) <<  m_tileValue;
@@ -109,7 +104,27 @@ void Tile::setLeft(Tile * tile)
 void Tile::setTileState(TileState state)
 {
 	m_tileState = state;
-	if (state == TileState::GOAL)
+
+	switch(state)
+	{
+	case OPEN:
+		setTileStateLabel("O");
+		break;
+	case CLOSED:
+		setTileStateLabel("C");
+		break;
+	case START:
+		setTileStateLabel("S");
+		break;
+	case GOAL:
+		setTileStateLabel("G");
+		break;
+	case UNDEFINED:
+		setTileStateLabel("-");
+		break;
+	}
+
+	if (state == GOAL)
 	{
 		m_tileValue = 0;
 	}
@@ -123,74 +138,13 @@ TileState Tile::getTileState()
 void Tile::setTargetDistance(glm::vec2 goalLocation)
 {
 	m_goalLocation = goalLocation;
+	m_tileValue = Util::distance(getPosition(), goalLocation) * 0.10f;
 
-	if(m_gridPosition != goalLocation)
-	{ 
-	float x1 = m_gridPosition.x;
-	float x2 = goalLocation.x;
-	float y1 = m_gridPosition.y;
-	float y2 = goalLocation.y;
-
-	float dx = abs(x1 - x2);
-	float dy = abs(y1 - y2);
-
-	int count = 1;
-	// check adjacent tiles **************************************
-	if (m_gridPosition.y != 0) 
-	{
-		if (up()->getTileState() == TileState::CLOSED) 
-		{
-			count++;
-		}
-	}
-
-	if (m_gridPosition.y != Config::ROW_NUM - 1) 
-	{
-		if (down()->getTileState() == TileState::CLOSED)
-		{
-			count++;
-		}
-	}
-	
-	if (m_gridPosition.x != Config::COL_NUM - 1)
-	{
-		if (right()->getTileState() == TileState::CLOSED)
-		{
-			count++;
-		}
-	}
-	
-	if (m_gridPosition.x != 0)
-	{
-		if (left()->getTileState() == TileState::CLOSED)
-		{
-			count++;
-		}
-	}
-
-	if (count > 3)
-	{
-		count = 99.9;
-		setTileState(TileState::CLOSED);
-		setTileStateLabel("C");
-	}
-
-	// heuristic combines manhattan distance with euclidean distance and takes into account passing next to mines
-	m_targetDist = m_manhanttanFactor * (dx + dy) + m_euclideanFactor * sqrt((dx *dx) + (dy * dy)) + m_mineFactor * count;
-	}
-	else
-	{
-		// assigning the goal a cost of zero
-		m_cost = 0;
-		m_targetDist = 0;
-	}
-
-	m_tileValue = m_cost + m_targetDist;
-	
 	std::ostringstream tempLabel;
 	tempLabel << std::fixed << std::setprecision(1) << m_tileValue;
 	std::string labelstring = tempLabel.str();
 	m_pValueLabel->setText(labelstring);
+	
 }
 
 glm::vec2 Tile::getGridPosition()
@@ -209,37 +163,4 @@ void Tile::setTileStateLabel(std::string closedOpen)
 
 	SDL_Color blue = { 0, 0, 255, 255 };
 	m_pClosedOpenLabel->setColour(blue);
-}
-
-float* Tile::getManhanttanFactor()
-{
-	return &m_manhanttanFactor;
-}
-
-void Tile::setManhanttanFactor(float newFactor)
-{
-	m_manhanttanFactor = newFactor;
-	setTargetDistance(m_goalLocation);
-}
-
-float* Tile::getEuclideanFactor()
-{
-	return &m_euclideanFactor;
-}
-
-void Tile::setEuclideanFactor(float newFactor)
-{
-	m_euclideanFactor = newFactor;
-	setTargetDistance(m_goalLocation);
-}
-
-float * Tile::getMineFactor()
-{
-	return &m_mineFactor;
-}
-
-void Tile::setMineFactor(float newFactor)
-{
-	m_mineFactor = newFactor;
-	setTargetDistance(m_goalLocation);
 }

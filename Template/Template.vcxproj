@@ -170,6 +170,7 @@
     <ClCompile Include="..\src\Label.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Mine.cpp" />
+    <ClCompile Include="..\src\PathFindingDisplayObject.cpp" />
     <ClCompile Include="..\src\Planet.cpp" />
     <ClCompile Include="..\src\PlayScene.cpp" />
     <ClCompile Include="..\src\Scene.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="..\src\GameObject.h" />
     <ClInclude Include="..\src\Label.h" />
     <ClInclude Include="..\src\Mine.h" />
+    <ClInclude Include="..\src\PathFindingDisplayObject.h" />
     <ClInclude Include="..\src\Planet.h" />
     <ClInclude Include="..\src\PlayScene.h" />
     <ClInclude Include="..\src\Scene.h" />
