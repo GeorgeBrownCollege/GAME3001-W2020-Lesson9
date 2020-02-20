@@ -34,6 +34,7 @@ private:
 	std::vector<Tile*> m_pGrid;
 
 	void m_buildGrid();
+	void m_mapTiles();
 
 	int m_spawnObject(PathFindingDisplayObject* object);
 	void m_spawnShip();

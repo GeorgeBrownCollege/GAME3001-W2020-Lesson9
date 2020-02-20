@@ -30,6 +30,20 @@ void PlayScene::m_buildGrid()
 	}
 }
 
+void PlayScene::m_mapTiles()
+{
+	for (auto tile : m_pGrid)
+	{
+		float x = tile->getGridPosition().x;
+		float y = tile->getGridPosition().y;
+
+		if(y != 0)                   { tile->setUp   (m_pGrid[x + ((y - 1) * Config::COL_NUM)]); }
+		if(x != Config::COL_NUM - 1) { tile->setRight(m_pGrid[(x + 1) + (y * Config::COL_NUM)]); }
+		if(y != Config::ROW_NUM - 1) { tile->setDown (m_pGrid[x + ((y + 1) * Config::COL_NUM)]); }
+		if(x != 0)					 { tile->setLeft (m_pGrid[(x - 1) + (y * Config::COL_NUM)]); }
+	}
+}
+
 int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
 {
 	Tile* randomTile = nullptr;
@@ -69,7 +83,7 @@ void PlayScene::m_computeTileValues()
 {
 	for (auto tile : m_pGrid)
 	{
-		tile->setTargetDistance(m_pPlanet->getPosition());
+		tile->setTargetDistance(m_pPlanet->getTile()->getGridPosition());
 	}
 }
 
@@ -253,6 +267,7 @@ void PlayScene::m_resetAll()
 void PlayScene::start()
 {
 	m_buildGrid();
+	m_mapTiles();
 
 	// instantiate planet and add it to the DisplayList
 	m_pPlanet = new Planet();
