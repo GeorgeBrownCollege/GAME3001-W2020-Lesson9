@@ -64,6 +64,8 @@ public:
 
 	void setTileStateLabel(std::string closedOpen);
 
+	std::vector<Tile*> getNeighbours();
+
 private:
 	float m_cost = Config::TILE_COST;
 	float m_targetDist = 0.0f;

@@ -10,6 +10,14 @@
 
 // Pathfinding & Steering functions ***********************************************
 
+void PlayScene::m_resetGrid()
+{
+	for (auto tile : m_pGrid)
+	{
+		tile->setTileState(UNDEFINED);
+	}
+}
+
 void PlayScene::m_buildGrid()
 {
 	const auto size = Config::TILE_SIZE;
@@ -46,6 +54,8 @@ void PlayScene::m_mapTiles()
 
 int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
 {
+	m_resetGrid();
+	
 	Tile* randomTile = nullptr;
 	int randomTileIndex = 0;
 	do
@@ -85,6 +95,40 @@ void PlayScene::m_computeTileValues()
 	{
 		tile->setTargetDistance(m_pPlanet->getTile()->getGridPosition());
 	}
+}
+
+Tile* PlayScene::m_findLowestCostTile(std::vector<Tile*> neighbours)
+{
+	Tile* minTile = nullptr;
+	float min = INFINITY;
+	
+	// for every tile in the neighbours vector
+	for (auto tile : neighbours)
+	{
+		if(min > tile->getTileValue())
+		{
+			min = tile->getTileValue();
+			if(minTile != nullptr)
+			{
+				minTile->setTileState(CLOSED);
+			}
+			
+			minTile = tile;
+			if (tile->getTileState() == UNDEFINED)
+			{
+				tile->setTileState(OPEN);
+			}
+		}
+		else
+		{
+			if(tile->getTileState() == UNDEFINED)
+			{
+				tile->setTileState(CLOSED);
+			}
+		}
+	}
+
+	return minTile;
 }
 
 
@@ -228,9 +272,9 @@ void PlayScene::m_updateUI()
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("A Third Button"))
+	if (ImGui::Button("Find Shortest Path"))
 	{
-
+		m_findLowestCostTile(m_pShip->getTile()->getNeighbours());
 	}
 
 	
@@ -373,7 +417,7 @@ void PlayScene::handleEvents()
 				m_displayUI = (m_displayUI) ? false : true;
 				break;
 			case SDLK_f:
-				
+				m_findLowestCostTile(m_pShip->getTile()->getNeighbours());
 				break;
 			case SDLK_g:
 				

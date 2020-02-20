@@ -172,3 +172,8 @@ void Tile::setTileStateLabel(std::string closedOpen)
 	SDL_Color blue = { 0, 0, 255, 255 };
 	m_pClosedOpenLabel->setColour(blue);
 }
+
+std::vector<Tile*> Tile::getNeighbours()
+{
+	return m_pNeighbours;
+}

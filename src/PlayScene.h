@@ -33,6 +33,7 @@ private:
 	// Tile & Grid members
 	std::vector<Tile*> m_pGrid;
 
+	void m_resetGrid();
 	void m_buildGrid();
 	void m_mapTiles();
 
@@ -41,6 +42,9 @@ private:
 	void m_spawnPlanet();
 
 	void m_computeTileValues();
+
+	// pathfinding functions
+	Tile* m_findLowestCostTile(std::vector<Tile*> neighbours);
 
 	glm::vec2 m_mousePosition;
 
