@@ -105,30 +105,54 @@ Tile* PlayScene::m_findLowestCostTile(std::vector<Tile*> neighbours)
 	// for every tile in the neighbours vector
 	for (auto tile : neighbours)
 	{
-		if(min > tile->getTileValue())
+		if(tile != nullptr)
 		{
-			min = tile->getTileValue();
-			if(minTile != nullptr)
+			if (tile->getTileState() == GOAL)
 			{
-				minTile->setTileState(CLOSED);
+				return tile;
 			}
-			
-			minTile = tile;
-			if (tile->getTileState() == UNDEFINED)
+
+			if (min > tile->getTileValue())
 			{
-				tile->setTileState(OPEN);
+				min = tile->getTileValue();
+				/*if (minTile != nullptr)
+				{
+					minTile->setTileState(CLOSED);
+				}*/
+
+				minTile = tile;
+				if (tile->getTileState() == UNDEFINED)
+				{
+					tile->setTileState(OPEN);
+				}
+
+
+			}
+			else
+			{
+				if (tile->getTileState() == UNDEFINED)
+				{
+					tile->setTileState(CLOSED);
+				}
 			}
 		}
-		else
-		{
-			if(tile->getTileState() == UNDEFINED)
-			{
-				tile->setTileState(CLOSED);
-			}
-		}
+		
 	}
 
 	return minTile;
+}
+
+void PlayScene::m_findShortestPath()
+{
+	
+	auto tile = m_pShip->getTile();
+
+	while(tile->getTileState() != GOAL)
+	{
+		const auto neighbours = tile->getNeighbours();
+
+		tile = m_findLowestCostTile(neighbours);
+	}
 }
 
 
@@ -274,7 +298,7 @@ void PlayScene::m_updateUI()
 
 	if (ImGui::Button("Find Shortest Path"))
 	{
-		m_findLowestCostTile(m_pShip->getTile()->getNeighbours());
+		m_findShortestPath();
 	}
 
 	
@@ -417,7 +441,7 @@ void PlayScene::handleEvents()
 				m_displayUI = (m_displayUI) ? false : true;
 				break;
 			case SDLK_f:
-				m_findLowestCostTile(m_pShip->getTile()->getNeighbours());
+				m_findShortestPath();
 				break;
 			case SDLK_g:
 				

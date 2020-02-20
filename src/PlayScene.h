@@ -46,6 +46,8 @@ private:
 	// pathfinding functions
 	Tile* m_findLowestCostTile(std::vector<Tile*> neighbours);
 
+	void m_findShortestPath();
+
 	glm::vec2 m_mousePosition;
 
 	// ImGui utility functions
