@@ -1,10 +1,11 @@
 #include "PlayScene.h"
-#include "Game.h"
-#include <ctime>
-#include "GLM/gtx/string_cast.hpp"
 #include <algorithm>
-#include "TileComparators.h"
+#include <ctime>
 #include <iomanip>
+#include "Game.h"
+#include "glm/gtx/string_cast.hpp"
+#include "IMGUI_SDL/imgui_sdl.h"
+#include "SceneState.h"
 #include "Util.h"
 
 
@@ -32,9 +33,9 @@ void PlayScene::m_buildGrid()
 	
 	m_pGrid = std::vector<Tile*>(); // instantiates a structure of type vector<Tile*>
 
-	for (int row = 0; row < Config::ROW_NUM; ++row)
+	for (auto row = 0; row < Config::ROW_NUM; ++row)
 	{
-		for (int col = 0; col < Config::COL_NUM; ++col)
+		for (auto col = 0; col < Config::COL_NUM; ++col)
 		{
 			auto tile = new Tile(glm::vec2(offset + size * col, offset + size * row), 
 				glm::vec2(col, row));
@@ -49,8 +50,8 @@ void PlayScene::m_mapTiles()
 {
 	for (auto tile : m_pGrid)
 	{
-		float x = tile->getGridPosition().x;
-		float y = tile->getGridPosition().y;
+		const auto x = tile->getGridPosition().x;
+		const auto y = tile->getGridPosition().y;
 
 		if(y != 0)                   { tile->setUp   (m_pGrid[x + ((y - 1) * Config::COL_NUM)]); }
 		if(x != Config::COL_NUM - 1) { tile->setRight(m_pGrid[(x + 1) + (y * Config::COL_NUM)]); }
@@ -64,7 +65,7 @@ int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
 	m_resetGrid();
 	
 	Tile* randomTile = nullptr;
-	int randomTileIndex = 0;
+	auto randomTileIndex = 0;
 	do
 	{
 		randomTileIndex = int(Util::RandomRange(0, m_pGrid.size() - 1));
@@ -116,10 +117,10 @@ void PlayScene::m_computeTileValues()
 	}
 }
 
-Tile* PlayScene::m_findLowestCostTile(std::vector<Tile*> neighbours)
+Tile* PlayScene::m_findLowestCostTile(const std::vector<Tile*>& neighbours)
 {
 	Tile* minTile = nullptr;
-	float min = INFINITY;
+	auto min = INFINITY;
 	
 	// for every tile in the neighbours vector
 	for (auto tile : neighbours)
@@ -155,8 +156,6 @@ Tile* PlayScene::m_findLowestCostTile(std::vector<Tile*> neighbours)
 				m_closedList.push_back(tile);
 			}
 		}
-
-		
 	}
 
 	return minTile;
@@ -180,7 +179,7 @@ void PlayScene::m_findShortestPath()
 
 void PlayScene::m_ImGuiKeyMap()
 {
-	ImGuiIO& io = ImGui::GetIO();
+	auto& io = ImGui::GetIO();
 
 	// Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
 	io.KeyMap[ImGuiKey_Tab] = SDL_SCANCODE_TAB;
@@ -209,7 +208,7 @@ void PlayScene::m_ImGuiKeyMap()
 
 void PlayScene::m_ImGuiSetStyle()
 {
-	ImGuiStyle& style = ImGui::GetStyle();
+	auto& style = ImGui::GetStyle();
 
 	style.Alpha = 0.8f;
 	style.FrameRounding = 3.0f;
@@ -262,7 +261,7 @@ void PlayScene::m_updateUI()
 
 	ImGui::Begin(&windowString[0], NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_MenuBar);
 
-	// set window to top left corner
+	// set window to top getLeft corner
 	ImGui::SetWindowPos(ImVec2(0, 0), true);
 
 	/*************************************************************************************************/
@@ -376,8 +375,7 @@ PlayScene::PlayScene()
 }
 
 PlayScene::~PlayScene()
-{
-}
+= default;
 
 void PlayScene::draw()
 {
@@ -417,15 +415,53 @@ void PlayScene::update()
 
 void PlayScene::clean()
 {
-	m_pShip->clean();
+	std::cout << "PlayScene Clean Called" << std::endl;
+	delete m_pShip;
+	delete m_pPlanet;
+
+	for (auto tile : m_pGrid)
+	{
+		delete tile;
+		tile = nullptr;
+	}
+	m_pGrid.clear();
+	m_pGrid.resize(0);
+	m_pGrid.shrink_to_fit();
+
+	for (auto mine : m_mines)
+	{
+		delete mine;
+		mine = nullptr;
+	}
+	m_mines.clear();
+	m_mines.resize(0);
+	m_mines.shrink_to_fit();
+
+	for (auto tile : m_openList)
+	{
+		delete tile;
+		tile = nullptr;
+	}
+	m_openList.clear();
+	m_openList.resize(0);
+	m_openList.shrink_to_fit();
+
+	for (auto tile : m_closedList)
+	{
+		delete tile;
+		tile = nullptr;
+	}
+	m_closedList.clear();
+	m_closedList.resize(0);
+	m_openList.shrink_to_fit();
 
 	removeAllChildren();
 }
 
 void PlayScene::handleEvents()
 {
-	ImGuiIO& io = ImGui::GetIO();
-	int wheel = 0;
+	auto& io = ImGui::GetIO();
+	auto wheel = 0;
 
 	SDL_Event event;
 	if (SDL_PollEvent(&event))
@@ -489,9 +525,12 @@ void PlayScene::handleEvents()
 			case SDLK_d:
 				
 				break;
+			default:
+				
+				break;
 			}
 			{
-				int key = event.key.keysym.scancode;
+				const int key = event.key.keysym.scancode;
 				IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
 				io.KeysDown[key] = (event.type == SDL_KEYDOWN);
 				io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
@@ -517,9 +556,12 @@ void PlayScene::handleEvents()
 			case SDLK_d:
 				
 				break;
+			default:
+				
+				break;
 			}
 			{
-				int key = event.key.keysym.scancode;
+				const int key = event.key.keysym.scancode;
 				IM_ASSERT(key >= 0 && key < IM_ARRAYSIZE(io.KeysDown));
 				io.KeysDown[key] = (event.type == SDL_KEYDOWN);
 				io.KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
@@ -529,6 +571,7 @@ void PlayScene::handleEvents()
 			}
 			break;
 		default:
+			
 			break;
 		}
 	}

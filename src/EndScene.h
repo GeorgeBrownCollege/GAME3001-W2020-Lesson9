@@ -5,7 +5,7 @@
 #include "Scene.h"
 #include "Label.h"
 
-class EndScene : public Scene
+class EndScene final : public Scene
 {
 public:
 	EndScene();
@@ -19,7 +19,7 @@ public:
 	virtual void start() override;
 
 private:
-	Label* m_Label;
+	Label* m_label{};
 };
 
 #endif /* defined (__END_SCENE__) */

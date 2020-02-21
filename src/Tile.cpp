@@ -1,29 +1,28 @@
 #include "Tile.h"
-#include "Game.h"
-#include "Util.h"
 #include <iomanip>
 #include <sstream>
+#include "Game.h"
 
-Tile::Tile(glm::vec2 worldPosition, glm::vec2 gridPosition):
-	m_gridPosition(gridPosition)
+Tile::Tile(glm::vec2 world_position, glm::vec2 grid_position):
+	m_gridPosition(grid_position)
 {
 	TheTextureManager::Instance()->load("../Assets/textures/tile.png",
 		"tile", TheGame::Instance()->getRenderer());
 
-	glm::vec2 size = TheTextureManager::Instance()->getTextureSize("tile");
+	auto size = TheTextureManager::Instance()->getTextureSize("tile");
 	setWidth(size.x);
 	setHeight(size.y);
-	setPosition(worldPosition);
+	setPosition(world_position);
 
 	std::ostringstream tempLabel;
 	tempLabel << std::fixed << std::setprecision(1) <<  m_tileValue;
-	std::string labelstring = tempLabel.str();
+	auto labelstring = tempLabel.str();
 
 	SDL_Color black{ 0, 0, 0, 255 };
-	glm::vec2 closedOpenLabelPosition = glm::vec2(getPosition().x, getPosition().y - 5);
+	auto closedOpenLabelPosition = glm::vec2(getPosition().x, getPosition().y - 5);
 	m_pClosedOpenLabel = new Label("-", "Consolas", 12, black, closedOpenLabelPosition);
 
-	glm::vec2 valueLabelPosition = glm::vec2(getPosition().x, getPosition().y + 10);
+	auto valueLabelPosition = glm::vec2(getPosition().x, getPosition().y + 10);
 	m_pValueLabel = new Label(labelstring, "Consolas", 14, black, valueLabelPosition, true);
 
 	m_pNeighbours = { nullptr, nullptr, nullptr, nullptr };
@@ -40,8 +39,8 @@ Tile::~Tile()
 
 void Tile::draw()
 {
-	int xComponent = getPosition().x;
-	int yComponent = getPosition().y;
+	const int xComponent = getPosition().x;
+	const int yComponent = getPosition().y;
 
 	TheTextureManager::Instance()->draw("tile", xComponent, yComponent,
 		TheGame::Instance()->getRenderer(), 0, 255, true);
@@ -59,22 +58,22 @@ void Tile::clean()
 	
 }
 
-Tile * Tile::up()
+Tile * Tile::getUp()
 {
 	return m_pNeighbours[UP];
 }
 
-Tile * Tile::down()
+Tile * Tile::getDown()
 {
 	return m_pNeighbours[DOWN];
 }
 
-Tile * Tile::right()
+Tile * Tile::getRight()
 {
 	return m_pNeighbours[RIGHT];
 }
 
-Tile * Tile::left()
+Tile * Tile::getLeft()
 {
 	return m_pNeighbours[LEFT];
 }
@@ -99,7 +98,7 @@ void Tile::setLeft(Tile * tile)
 	m_pNeighbours[LEFT] = tile;
 }
 
-void Tile::setTileState(TileState state)
+void Tile::setTileState(const TileState state)
 {
 	m_tileState = state;
 
@@ -121,6 +120,9 @@ void Tile::setTileState(TileState state)
 	case UNDEFINED:
 		setTileStateLabel("-");
 		break;
+	default:
+		std::cout << "a state that has not been defined" << std::endl;
+		break;
 	}
 
 	if (state == GOAL)
@@ -134,24 +136,24 @@ TileState Tile::getTileState()
 	return m_tileState;
 }
 
-void Tile::setTargetDistance(glm::vec2 goalLocation)
+void Tile::setTargetDistance(const glm::vec2 goal_location)
 {
-	m_goalLocation = goalLocation;
+	m_goalLocation = goal_location;
 
 	// use euclidean distance heuristic
 	//float h = Util::distance(getGridPosition(), goalLocation);
 
 	// manhattan distance heuristic
-	float h = abs(getGridPosition().x - goalLocation.x) +
-		      abs(getGridPosition().y - goalLocation.y);
+	const auto h = abs(getGridPosition().x - goal_location.x) +
+		      abs(getGridPosition().y - goal_location.y);
 
-	float g = Config::TILE_COST;
+	const float g = Config::TILE_COST;
 	
 	m_tileValue = g + h;
 
 	std::ostringstream tempLabel;
 	tempLabel << std::fixed << std::setprecision(1) << m_tileValue;
-	std::string labelstring = tempLabel.str();
+	const auto labelstring = tempLabel.str();
 	m_pValueLabel->setText(labelstring);
 	
 }
@@ -166,11 +168,11 @@ float Tile::getTileValue()
 	return m_tileValue;
 }
 
-void Tile::setTileStateLabel(std::string closedOpen)
+void Tile::setTileStateLabel(const std::string& closed_open)
 {
-	m_pClosedOpenLabel->setText(closedOpen);
+	m_pClosedOpenLabel->setText(closed_open);
 
-	SDL_Color blue = { 0, 0, 255, 255 };
+	const SDL_Color blue = { 0, 0, 255, 255 };
 	m_pClosedOpenLabel->setColour(blue);
 }
 

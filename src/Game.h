@@ -1,25 +1,20 @@
 #pragma once
-#ifndef __Game__
-#define __Game__
+#ifndef __GAME__
+#define __GAME__
 
 // Core Libraries
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
+#include "SceneState.h"
 
 #include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
 
 // IMGUI Includes
 #include "IMGUI/imgui.h"
-#include "IMGUI_SDL/imgui_sdl.h"
 
 // Game Managers
-#include "Config.h"
-#include "TextureManager.h"
 #include "CollisionManager.h"
-#include "Util.h"
 
 // Scenes
 #include "StartScene.h"
@@ -45,25 +40,25 @@ public:
 	// simply set the running variable to true
 	void init() { m_bRunning = true; }
 
-	bool init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+	bool init(const char* title, int x, int y, int width, int height, bool fullscreen);
 
 	// public functions
-	void render();
-	void update();
+	void render() const;
+	void update() const;
 	void handleEvents();
-	void clean();
+	void clean() const;
 
 	// a function to access the private running variable
 	bool running() { return m_bRunning; }
 
 	// getters
-	SDL_Renderer* getRenderer();
-	glm::vec2 getMousePosition();
+	SDL_Renderer* getRenderer() const;
+	glm::vec2 getMousePosition() const;
 
 	void setFrames(Uint32 frames);
-	Uint32 getFrames();
+	Uint32 getFrames() const;
 
-	void changeSceneState(SceneState newState);
+	void changeSceneState(SceneState new_state);
 	void quit();
 
 private:
@@ -91,5 +86,5 @@ private:
 
 typedef Game TheGame;
 
-#endif /* defined (__Game__) */
+#endif /* defined (__GAME__) */
 

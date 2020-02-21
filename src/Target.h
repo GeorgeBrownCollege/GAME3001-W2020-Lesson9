@@ -1,12 +1,10 @@
 #pragma once
-#ifndef __Target__
-#define __Target__
+#ifndef __TARGET__
+#define __TARGET__
 
 #include "DisplayObject.h"
-#include "TextureManager.h"
-#include "Scene.h"
 
-class Target : public DisplayObject {
+class Target final : public DisplayObject {
 public:
 	Target();
 	~Target();
@@ -18,11 +16,9 @@ public:
 
 private:
 	void m_move();
-
 	void m_checkBounds();
-
 	void m_reset();
 };
 
 
-#endif /* defined (__Target__) */
+#endif /* defined (__TARGET__) */

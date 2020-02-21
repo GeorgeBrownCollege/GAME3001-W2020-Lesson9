@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __Util__
-#define __Util__
+#ifndef __UTIL__
+#define __UTIL__
 
 #include "GLM/vec2.hpp"
 
@@ -38,4 +38,4 @@ public:
 	static float dot(glm::vec2 lhs, glm::vec2 rhs);
 
 };
-#endif /* defined (__Util__) */
+#endif /* defined (__UTIL__) */

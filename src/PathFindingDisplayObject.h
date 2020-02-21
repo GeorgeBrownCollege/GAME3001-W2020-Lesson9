@@ -15,8 +15,8 @@ public:
 	virtual void clean() override = 0;
 
 	// pathfinding behaviours
-	Tile* getTile();
-	void setTile(Tile* newTile);
+	Tile* getTile() const;
+	void setTile(Tile* new_tile);
 private:
 	Tile* m_currentTile;
 };

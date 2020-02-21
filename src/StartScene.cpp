@@ -1,10 +1,7 @@
 #include "StartScene.h"
-#include "Game.h"
-#include <ctime>
-#include "GLM/gtx/string_cast.hpp"
 #include <algorithm>
-#include "TileComparators.h"
-#include <iomanip>
+#include "Game.h"
+#include "glm/gtx/string_cast.hpp"
 
 StartScene::StartScene()
 {
@@ -12,8 +9,7 @@ StartScene::StartScene()
 }
 
 StartScene::~StartScene()
-{
-}
+= default;
 
 void StartScene::draw()
 {
@@ -29,10 +25,16 @@ void StartScene::update()
 
 void StartScene::clean()
 {
+	std::cout << "Clean called on StartScene" << std::endl;
+	
 	delete m_pStartLabel;
+	m_pStartLabel = nullptr;
+	
 	delete m_pInstructionsLabel;
+	m_pInstructionsLabel = nullptr;
 
 	delete m_pShip;
+	m_pShip = nullptr;
 
 	removeAllChildren();
 }
@@ -70,7 +72,7 @@ void StartScene::handleEvents()
 
 void StartScene::start()
 {
-	SDL_Color blue = { 0, 0, 255, 255 };
+	const SDL_Color blue = { 0, 0, 255, 255 };
 	m_pStartLabel = new Label("START SCENE", "Consolas", 80, blue, glm::vec2(400.0f, 40.0f));
 	m_pStartLabel->setParent(this);
 	addChild(m_pStartLabel);

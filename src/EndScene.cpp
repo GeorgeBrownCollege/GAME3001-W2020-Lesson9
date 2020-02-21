@@ -1,10 +1,7 @@
 #include "EndScene.h"
-#include "Game.h"
-#include <ctime>
-#include "GLM/gtx/string_cast.hpp"
 #include <algorithm>
-#include "TileComparators.h"
-#include <iomanip>
+#include "Game.h"
+#include "glm/gtx/string_cast.hpp"
 
 EndScene::EndScene()
 {
@@ -12,12 +9,11 @@ EndScene::EndScene()
 }
 
 EndScene::~EndScene()
-{
-}
+= default;
 
 void EndScene::draw()
 {
-	m_Label->draw();
+	m_label->draw();
 }
 
 void EndScene::update()
@@ -26,7 +22,7 @@ void EndScene::update()
 
 void EndScene::clean()
 {
-	delete m_Label;
+	delete m_label;
 	removeAllChildren();
 }
 
@@ -62,8 +58,8 @@ void EndScene::handleEvents()
 
 void EndScene::start()
 {
-	SDL_Color blue = { 0, 0, 255, 255 };
-	m_Label = new Label("END SCENE", "Dock51", 80, blue, glm::vec2(400.0f, 40.0f));
-	m_Label->setParent(this);
-	addChild(m_Label);
+	const SDL_Color blue = { 0, 0, 255, 255 };
+	m_label = new Label("END SCENE", "Dock51", 80, blue, glm::vec2(400.0f, 40.0f));
+	m_label->setParent(this);
+	addChild(m_label);
 }

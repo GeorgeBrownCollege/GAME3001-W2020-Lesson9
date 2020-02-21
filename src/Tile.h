@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __Tile__
-#define __Tile__
+#ifndef __TILE__
+#define __TILE__
 
 #include <vector>
 
@@ -10,42 +10,25 @@
 #include "Label.h"
 #include "Scene.h"
 
-enum TileState {
-	OPEN,
-	CLOSED,
-	START,
-	GOAL,
-	UNDEFINED,
-	NUM_OF_TILE_STATES
-};
+#include "TileState.h"
+#include "TileNeighbour.h"
 
-enum TileNeighbour
-{
-	UP,
-	RIGHT,
-	DOWN,
-	LEFT,
-	NUM_OF_NEIGHBOURS
-};
-
-class Tile : public DisplayObject
+class Tile final : public DisplayObject
 {
 public:
-	Tile(glm::vec2 worldPosition = glm::vec2(), glm::vec2 gridPosition = glm::vec2());
+	Tile(glm::vec2 world_position = glm::vec2(), glm::vec2 grid_position = glm::vec2());
 	~Tile();
 
 	// Inherited via GameObject
 	virtual void draw() override;
-
 	virtual void update() override;
-
 	virtual void clean() override;
 
 	// get neighbours
-	Tile* up();
-	Tile* down();
-	Tile* right();
-	Tile* left();
+	Tile* getUp();
+	Tile* getDown();
+	Tile* getRight();
+	Tile* getLeft();
 
 	// set neighbours
 	void setUp(Tile* tile);
@@ -56,13 +39,13 @@ public:
 	void setTileState(TileState state);
 	TileState getTileState();
 
-	void setTargetDistance(glm::vec2 goalLocation);
+	void setTargetDistance(glm::vec2 goal_location);
 
 	glm::vec2 getGridPosition();
 
 	float getTileValue();
 
-	void setTileStateLabel(std::string closedOpen);
+	void setTileStateLabel(const std::string& closed_open);
 
 	std::vector<Tile*> getNeighbours();
 
@@ -72,6 +55,8 @@ private:
 	float m_tileValue = 0.0f;
 	TileState m_tileState;
 	glm::vec2 m_gridPosition;
+
+	// labels
 	Label* m_pValueLabel;
 	Label* m_pClosedOpenLabel;
 
@@ -81,4 +66,4 @@ private:
 };
 
 
-#endif /* defined (__Tile__) */
+#endif /* defined (__TILE__) */

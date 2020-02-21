@@ -2,16 +2,17 @@
 #ifndef __Mine__
 #define __Mine__
 
-#include "DisplayObject.h"
+
 #include "TextureManager.h"
 #include "SoundManager.h"
 #include "Tile.h"
 #include "Scene.h"
+#include "PathFindingDisplayObject.h"
 
-class Mine : public DisplayObject
+class Mine final : public PathFindingDisplayObject
 {
 public:
-	Mine();
+     Mine();
 	~Mine();
 
 	// Inherited via GameObject
@@ -21,12 +22,8 @@ public:
 
 	virtual void clean() override;
 
-	// pathfinding behaviours
-	Tile* getTile();
-	void setTile(Tile* newTile);
-
 private:
-	Tile* m_currentTile;
+
 };
 
 

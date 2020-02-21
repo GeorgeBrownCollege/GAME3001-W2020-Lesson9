@@ -15,13 +15,12 @@ Planet::Planet()
 }
 
 Planet::~Planet()
-{
-}
+= default;
 
 void Planet::draw()
 {
-	int xComponent = getPosition().x;
-	int yComponent = getPosition().y;
+	const int xComponent = getPosition().x;
+	const int yComponent = getPosition().y;
 
 	TheTextureManager::Instance()->draw("planet", xComponent, yComponent,
 		TheGame::Instance()->getRenderer(), 0, 255, true);

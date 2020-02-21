@@ -1,15 +1,11 @@
 #pragma once
-#ifndef __Planet__
-#define __Planet__
+#ifndef __PLANET__
+#define __PLANET__
 
 #include "PathFindingDisplayObject.h"
-#include "TextureManager.h"
-#include "SoundManager.h"
-#include "Tile.h"
-#include "Scene.h"
 
 
-class Planet : public PathFindingDisplayObject
+class Planet final : public PathFindingDisplayObject
 {
 public:
 	Planet();
@@ -17,13 +13,11 @@ public:
 
 	// Inherited via GameObject
 	virtual void draw() override;
-
 	virtual void update() override;
-
 	virtual void clean() override;
 
 private:
 };
 
 
-#endif /* defined (__Planet__) */
+#endif /* defined (__PLANET__) */

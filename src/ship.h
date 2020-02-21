@@ -1,16 +1,11 @@
 #pragma once
-#ifndef __Ship__
-#define __Ship__
-
-#include <vector>
+#ifndef __SHIP__
+#define __SHIP__
 
 #include "PathFindingDisplayObject.h"
 #include "TextureManager.h"
-#include "SoundManager.h"
-#include "Tile.h"
-#include "Scene.h"
 
-class Ship : public PathFindingDisplayObject
+class Ship final : public PathFindingDisplayObject
 {
 public:
 	Ship();
@@ -18,9 +13,7 @@ public:
 
 	// Inherited via GameObject
 	void draw() override;
-
 	void update() override;
-
 	void clean() override;
 
 	void turnRight();
@@ -47,5 +40,5 @@ private:
 };
 
 
-#endif /* defined (__Ship__) */
+#endif /* defined (__SHIP__) */
 

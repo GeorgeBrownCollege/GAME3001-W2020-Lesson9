@@ -5,13 +5,12 @@
 #include "Scene.h"
 
 // Game Objects
+#include "Mine.h"
+#include "Planet.h"
 #include "ship.h"
 #include "Tile.h"
-#include "Planet.h"
 
-#include <memory>
-
-class PlayScene : public Scene
+class PlayScene final : public Scene
 {
 public:
 	PlayScene();
@@ -32,6 +31,9 @@ private:
 	// Tile & Grid members
 	std::vector<Tile*> m_pGrid;
 
+	// mines
+	std::vector<Mine*> m_mines;
+
 	void m_resetGrid();
 	void m_buildGrid();
 	void m_mapTiles();
@@ -43,7 +45,7 @@ private:
 	void m_computeTileValues();
 
 	// pathfinding functions
-	Tile* m_findLowestCostTile(std::vector<Tile*> neighbours);
+	Tile* m_findLowestCostTile(const std::vector<Tile*>& neighbours);
 
 	void m_findShortestPath();
 	std::vector<Tile*> m_openList;
