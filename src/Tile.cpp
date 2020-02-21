@@ -116,6 +116,7 @@ void Tile::setTileState(TileState state)
 		break;
 	case GOAL:
 		setTileStateLabel("G");
+		m_tileValue = 0;
 		break;
 	case UNDEFINED:
 		setTileStateLabel("-");

@@ -12,10 +12,17 @@
 
 void PlayScene::m_resetGrid()
 {
-	for (auto tile : m_pGrid)
-	{
-		tile->setTileState(UNDEFINED);
-	}
+		for (auto tile : m_openList)
+		{
+			tile->setTileState(UNDEFINED);
+			m_openList.pop_back();
+		}
+
+		for (auto tile : m_closedList)
+		{
+			tile->setTileState(UNDEFINED);
+			m_closedList.pop_back();
+		}
 }
 
 void PlayScene::m_buildGrid()
@@ -78,15 +85,27 @@ int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
 
 void PlayScene::m_spawnShip()
 {
+	if(m_pShip->getTile() != nullptr)
+	{
+		m_pShip->getTile()->setTileState(UNDEFINED);
+	}
+	
 	const auto randomTileIndex = m_spawnObject(m_pShip);
 	m_pGrid[randomTileIndex]->setTileState(START);
 }
 
 void PlayScene::m_spawnPlanet()
 {
+	if(m_pPlanet->getTile() != nullptr)
+	{
+		m_pPlanet->getTile()->setTileState(UNDEFINED);
+	}
+	
 	const auto randomTileIndex = m_spawnObject(m_pPlanet);
-	m_pGrid[randomTileIndex]->setTileState(GOAL);
+	auto tile = m_pGrid[randomTileIndex];
 	m_computeTileValues();
+	tile->setTileState(GOAL);
+	
 }
 
 void PlayScene::m_computeTileValues()
@@ -105,37 +124,38 @@ Tile* PlayScene::m_findLowestCostTile(std::vector<Tile*> neighbours)
 	// for every tile in the neighbours vector
 	for (auto tile : neighbours)
 	{
-		if(tile != nullptr)
+		// ensure the tile you are inspecting is not a nullptr
+		if (tile != nullptr)
 		{
-			if (tile->getTileState() == GOAL)
-			{
-				return tile;
-			}
-
+			// find the minimum value
 			if (min > tile->getTileValue())
 			{
 				min = tile->getTileValue();
-				/*if (minTile != nullptr)
-				{
-					minTile->setTileState(CLOSED);
-				}*/
-
 				minTile = tile;
-				if (tile->getTileState() == UNDEFINED)
-				{
-					tile->setTileState(OPEN);
-				}
-
-
-			}
-			else
-			{
-				if (tile->getTileState() == UNDEFINED)
-				{
-					tile->setTileState(CLOSED);
-				}
 			}
 		}
+	}
+
+	// now for every tile in the neighbours vector
+	for (auto tile : neighbours)
+	{
+		// check if the tile is not a nullptr and make sure it is only undefined
+		if ((tile != nullptr) && (tile->getTileState() == UNDEFINED))
+		{
+			// mark the minimum tile as open and add it to the open list
+			if (tile == minTile)
+			{
+				tile->setTileState(OPEN);
+				m_openList.push_back(tile);
+			}
+			// mark the other tiles as closed and add them to the closed list
+			else
+			{
+				tile->setTileState(CLOSED);
+				m_closedList.push_back(tile);
+			}
+		}
+
 		
 	}
 

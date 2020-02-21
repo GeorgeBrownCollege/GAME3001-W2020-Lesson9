@@ -9,7 +9,6 @@
 #include "Tile.h"
 #include "Planet.h"
 
-
 #include <memory>
 
 class PlayScene : public Scene
@@ -47,6 +46,8 @@ private:
 	Tile* m_findLowestCostTile(std::vector<Tile*> neighbours);
 
 	void m_findShortestPath();
+	std::vector<Tile*> m_openList;
+	std::vector<Tile*> m_closedList;
 
 	glm::vec2 m_mousePosition;
 
