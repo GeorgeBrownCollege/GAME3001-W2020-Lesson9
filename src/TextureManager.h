@@ -12,6 +12,8 @@
 // SDL Libraries
 #include<SDL.h>
 
+#include "Config.h"
+
 class TextureManager {
 public:
 	static TextureManager* Instance()
@@ -46,7 +48,7 @@ public:
 
 	void setColour(const std::string& id, Uint8 red, Uint8 green, Uint8 blue);
 
-	bool addTexture(const std::string& id, SDL_Texture* texture);
+	bool addTexture(const std::string& id, std::shared_ptr<SDL_Texture> texture);
 	SDL_Texture* getTexture(const std::string& id);
 
 	void removeTexture(const std::string& id);
@@ -63,7 +65,7 @@ private:
 
 	bool m_exists(const std::string& id);
 
-	std::unordered_map<std::string, SDL_Texture*> m_textureMap;
+	std::unordered_map<std::string, std::shared_ptr<SDL_Texture>> m_textureMap;
 
 	static TextureManager* s_pInstance;
 };

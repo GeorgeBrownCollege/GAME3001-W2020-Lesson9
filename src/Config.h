@@ -1,9 +1,10 @@
 #pragma once
 #ifndef __CONFIG__
 #define __CONFIG__
+#include <SDL_ttf.h>
 
 class Config {
-public:	
+public:
 	static const int SCREEN_WIDTH = 800;
 	static const int SCREEN_HEIGHT = 600;
 	static const int ROW_NUM = 15;
@@ -11,12 +12,17 @@ public:
 	static const int TILE_SIZE = 40;
 	static const int TILE_COST = 1;
 
-	template<typename Creator, typename Destructor, typename... Arguments>
-	static auto make_resource(Creator c, Destructor d, Arguments&&... args)
-	{
-		auto r = c(std::forward<Arguments>(args)...);
-		if (!r) { throw std::system_error(errno, std::generic_category()); }
-		return std::unique_ptr<std::decay_t<decltype(*r)>, decltype(d)>(r, d);
+	// Define Custom Deleters for shared_ptr types
+	static void SDL_DelRes(SDL_Window* r) { SDL_DestroyWindow(r); }
+	static void SDL_DelRes(SDL_Renderer* r) { SDL_DestroyRenderer(r); }
+	static void SDL_DelRes(SDL_Texture* r) { SDL_DestroyTexture(r); }
+	static void SDL_DelRes(SDL_Surface* r) { SDL_FreeSurface(r); }
+	static void SDL_DelRes(TTF_Font* r) { TTF_CloseFont(r); }
+
+	// template function to create and return shared_ptr instance
+	template <typename T>
+	static std::shared_ptr<T> make_resource(T* t) {
+		return std::shared_ptr<T>(t, [](T* t) { Config::SDL_DelRes(t); });
 	}
 
 };

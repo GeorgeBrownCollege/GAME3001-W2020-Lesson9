@@ -14,8 +14,6 @@ Game::Game() :
 	m_pWindow(nullptr), m_pRenderer(nullptr), m_currentFrame(0), m_bRunning(true), m_frames(0), m_currentScene(nullptr), m_currentSceneState(NO_SCENE)
 {
 	srand(unsigned(time(nullptr)));  // random seed
-
-	
 }
 
 Game::~Game()
@@ -37,19 +35,23 @@ bool Game::init(const char* title, const int x, const int y, const int width, co
 		std::cout << "SDL Init success" << std::endl;
 
 		// if succeeded create our window
-		m_pWindow = SDL_CreateWindow(title, x, y, width, height, flags);
+		//m_pWindow = SDL_CreateWindow(title, x, y, width, height, flags);
+		m_pWindow = (Config::make_resource(SDL_CreateWindow(title, x, y, width, height, flags)));
 
+		
+		
 		// if window creation successful create our renderer
 		if (m_pWindow != nullptr)
 		{
 			std::cout << "window creation success" << std::endl;
-			m_pRenderer = SDL_CreateRenderer(m_pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			//m_pRenderer = SDL_CreateRenderer(m_pWindow.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
+			m_pRenderer = (Config::make_resource(SDL_CreateRenderer(m_pWindow.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)));
 
 			if (m_pRenderer != nullptr) // render init success
 			{
 				std::cout << "renderer creation success" << std::endl;
-				SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
+				SDL_SetRenderDrawColor(m_pRenderer.get(), 255, 255, 255, 255);
 			}
 			else
 			{
@@ -59,7 +61,7 @@ bool Game::init(const char* title, const int x, const int y, const int width, co
 
 			// IMGUI 
 			ImGui::CreateContext();
-			ImGuiSDL::Initialize(m_pRenderer, width, height);
+			ImGuiSDL::Initialize(m_pRenderer.get(), width, height);
 
 			// Initialize Font Support
 			if (TTF_Init() == -1)
@@ -98,7 +100,7 @@ void Game::start()
 
 SDL_Renderer * Game::getRenderer() const
 {
-	return m_pRenderer;
+	return m_pRenderer.get();
 }
 
 glm::vec2 Game::getMousePosition() const
@@ -165,11 +167,11 @@ void Game::quit()
 
 void Game::render() const
 {
-	SDL_RenderClear(m_pRenderer); // clear the renderer to the draw colour
+	SDL_RenderClear(m_pRenderer.get()); // clear the renderer to the draw colour
 
 	m_currentScene->draw();
 
-	SDL_RenderPresent(m_pRenderer); // draw to the screen
+	SDL_RenderPresent(m_pRenderer.get()); // draw to the screen
 }
 
 void Game::update() const
@@ -181,17 +183,12 @@ void Game::clean() const
 {
 	std::cout << "cleaning game" << std::endl;
 
-	SDL_DestroyRenderer(m_pRenderer);
-	SDL_DestroyWindow(m_pWindow);
-
 	// Clean Up for ImGui
 	ImGui::DestroyContext();
 
 	TTF_Quit();
 
 	SDL_Quit();
-
-	
 }
 
 void Game::handleEvents()

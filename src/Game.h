@@ -21,6 +21,8 @@
 #include "PlayScene.h"
 #include "EndScene.h"
 
+#include "Config.h"
+
 class Game
 {
 public:
@@ -28,7 +30,7 @@ public:
 
 	static Game* Instance()
 	{
-		if (s_pInstance == 0)
+		if (s_pInstance == nullptr)
 		{
 			s_pInstance = new Game();
 			return s_pInstance;
@@ -61,12 +63,14 @@ public:
 	void changeSceneState(SceneState new_state);
 	void quit();
 
+	
 private:
 	Game();
 	~Game();
 
-	SDL_Window* m_pWindow;
-	SDL_Renderer* m_pRenderer;
+	std::shared_ptr<SDL_Window> m_pWindow;
+
+	std::shared_ptr<SDL_Renderer> m_pRenderer;
 
 	int m_currentFrame;
 

@@ -437,20 +437,10 @@ void PlayScene::clean()
 	m_mines.resize(0);
 	m_mines.shrink_to_fit();
 
-	for (auto tile : m_openList)
-	{
-		delete tile;
-		tile = nullptr;
-	}
 	m_openList.clear();
 	m_openList.resize(0);
 	m_openList.shrink_to_fit();
 
-	for (auto tile : m_closedList)
-	{
-		delete tile;
-		tile = nullptr;
-	}
 	m_closedList.clear();
 	m_closedList.resize(0);
 	m_openList.shrink_to_fit();

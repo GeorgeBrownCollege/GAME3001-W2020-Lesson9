@@ -12,6 +12,7 @@
 #include<SDL_image.h>
 #include <SDL_ttf.h>
 #include <string>
+#include "Config.h"
 
 class FontManager 
 {
@@ -40,7 +41,7 @@ private:
 
 	bool m_exists(const std::string& id);
 
-	std::unordered_map<std::string, TTF_Font*> m_fontMap;
+	std::unordered_map<std::string, std::shared_ptr<TTF_Font>> m_fontMap;
 
 	static FontManager* s_pInstance;
 	
