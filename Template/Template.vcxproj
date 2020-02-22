@@ -198,6 +198,7 @@
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\GameObject.h" />
     <ClInclude Include="..\src\GameObjectType.h" />
+    <ClInclude Include="..\src\Heuristic.h" />
     <ClInclude Include="..\src\Label.h" />
     <ClInclude Include="..\src\Mine.h" />
     <ClInclude Include="..\src\PathFindingDisplayObject.h" />

@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <sstream>
 #include "Game.h"
+#include "Util.h"
+
 
 Tile::Tile(glm::vec2 world_position, glm::vec2 grid_position):
 	m_gridPosition(grid_position)
@@ -26,6 +28,7 @@ Tile::Tile(glm::vec2 world_position, glm::vec2 grid_position):
 	m_pValueLabel = new Label(labelstring, "Consolas", 14, black, valueLabelPosition, true);
 
 	m_pNeighbours = { nullptr, nullptr, nullptr, nullptr };
+	m_heuristic = MANHATTAN;
 }
 
 Tile::~Tile()
@@ -131,7 +134,7 @@ void Tile::setTileState(const TileState state)
 	}
 }
 
-TileState Tile::getTileState()
+TileState Tile::getTileState() const
 {
 	return m_tileState;
 }
@@ -140,12 +143,23 @@ void Tile::setTargetDistance(const glm::vec2 goal_location)
 {
 	m_goalLocation = goal_location;
 
-	// use euclidean distance heuristic
-	//float h = Util::distance(getGridPosition(), goalLocation);
+	// declare heuristic;
+	auto h = 0.0f;
 
-	// manhattan distance heuristic
-	const auto h = abs(getGridPosition().x - goal_location.x) +
-		      abs(getGridPosition().y - goal_location.y);
+	switch(m_heuristic)
+	{
+		case EUCLIDEAN:
+			//euclidean distance heuristic
+			h = Util::distance(getGridPosition(), goal_location);
+			break;
+		case MANHATTAN:
+			//manhattan distance heuristic
+			h = abs(getGridPosition().x - goal_location.x) +
+				abs(getGridPosition().y - goal_location.y);
+			break;
+		default:
+			break;
+	}
 
 	const float g = Config::TILE_COST;
 	
@@ -158,17 +172,17 @@ void Tile::setTargetDistance(const glm::vec2 goal_location)
 	
 }
 
-glm::vec2 Tile::getGridPosition()
+glm::vec2 Tile::getGridPosition() const
 {
 	return m_gridPosition;
 }
 
-float Tile::getTileValue()
+float Tile::getTileValue() const
 {
 	return m_tileValue;
 }
 
-void Tile::setTileStateLabel(const std::string& closed_open)
+void Tile::setTileStateLabel(const std::string& closed_open) const
 {
 	m_pClosedOpenLabel->setText(closed_open);
 
@@ -176,7 +190,12 @@ void Tile::setTileStateLabel(const std::string& closed_open)
 	m_pClosedOpenLabel->setColour(blue);
 }
 
-std::vector<Tile*> Tile::getNeighbours()
+std::vector<Tile*> Tile::getNeighbours() const
 {
 	return m_pNeighbours;
+}
+
+void Tile::setHeuristic(const Heuristic heuristic)
+{
+	m_heuristic = heuristic;
 }

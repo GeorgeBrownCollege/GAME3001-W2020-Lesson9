@@ -12,6 +12,7 @@
 
 #include "TileState.h"
 #include "TileNeighbour.h"
+#include "Heuristic.h"
 
 class Tile final : public DisplayObject
 {
@@ -37,17 +38,19 @@ public:
 	void setLeft(Tile* tile);
 
 	void setTileState(TileState state);
-	TileState getTileState();
+	TileState getTileState() const;
 
 	void setTargetDistance(glm::vec2 goal_location);
 
-	glm::vec2 getGridPosition();
+	glm::vec2 getGridPosition() const;
 
-	float getTileValue();
+	float getTileValue() const;
 
-	void setTileStateLabel(const std::string& closed_open);
+	void setTileStateLabel(const std::string& closed_open) const;
 
-	std::vector<Tile*> getNeighbours();
+	std::vector<Tile*> getNeighbours() const;
+
+	void setHeuristic(Heuristic heuristic);
 
 private:
 	float m_cost = Config::TILE_COST;
@@ -61,8 +64,8 @@ private:
 	Label* m_pClosedOpenLabel;
 
 	glm::vec2 m_goalLocation;
-
 	std::vector<Tile*> m_pNeighbours;
+	Heuristic m_heuristic;
 };
 
 

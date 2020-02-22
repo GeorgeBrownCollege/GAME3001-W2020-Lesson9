@@ -4,9 +4,9 @@
 #include <iomanip>
 #include "Game.h"
 #include "glm/gtx/string_cast.hpp"
-#include "IMGUI_SDL/imgui_sdl.h"
 #include "SceneState.h"
 #include "Util.h"
+#include "IMGUI_SDL/imgui_sdl.h"
 
 
 // Pathfinding & Steering functions ***********************************************
@@ -113,6 +113,7 @@ void PlayScene::m_computeTileValues()
 {
 	for (auto tile : m_pGrid)
 	{
+		tile->setHeuristic(m_heuristic);
 		tile->setTargetDistance(m_pPlanet->getTile()->getGridPosition());
 	}
 }
@@ -174,8 +175,36 @@ void PlayScene::m_findShortestPath()
 	}
 }
 
+void PlayScene::m_selectHeuristic(Heuristic heuristic)
+{
+	// recalculate grid
+	m_heuristic = heuristic;
+	auto start = m_pShip->getTile();
+	auto goal = m_pPlanet->getTile();
+	m_resetGrid();
+	m_computeTileValues();
+	start->setTileState(START);
+	goal->setTileState(GOAL);
+	m_findShortestPath();
+
+	// change button colour depending on heuristic chosen
+	switch(heuristic)
+	{
+	case MANHATTAN:
+		m_manhattanButtonColour = ImVec4(0.26f, 1.0f, 0.98f, 1.0f);
+		m_euclideanButtonColour = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+		break;
+	case EUCLIDEAN:
+		m_manhattanButtonColour = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+		m_euclideanButtonColour = ImVec4(0.26f, 1.0f, 0.98f, 1.0f);
+		break;
+	}
+	
+}
 
 // ImGui functions ***********************************************
+
+
 
 void PlayScene::m_ImGuiKeyMap()
 {
@@ -320,25 +349,24 @@ void PlayScene::m_updateUI()
 		m_findShortestPath();
 	}
 
-	
-
-	ImGui::PushItemWidth(80);
-	/*if (ImGui::SliderFloat("Some Float", &myFloat, 0.1f, 10.0f, "%.1f"))
+	if(ImGui::CollapsingHeader("Heuristic Options"))
 	{
-		
-	}*/
+		ImGui::PushStyleColor(ImGuiCol_Button, m_manhattanButtonColour);
+		if (ImGui::Button("Manhattan Distance"))
+		{
+			m_selectHeuristic(MANHATTAN);
+		}
+		ImGui::PopStyleColor();
 
+		ImGui::SameLine();
 
-	
-	ImGui::PopItemWidth();
-
-	if (ImGui::CollapsingHeader("Some Collapsing Header"))
-	{
-		ImGui::PushItemWidth(80);
-
-		ImGui::PopItemWidth();
+		ImGui::PushStyleColor(ImGuiCol_Button, m_euclideanButtonColour);
+		if (ImGui::Button("Euclidean Distance"))
+		{
+			m_selectHeuristic(EUCLIDEAN);
+		}
+		ImGui::PopStyleColor();
 	}
-
 	
 
 	// Main Window End
@@ -353,6 +381,11 @@ void PlayScene::m_resetAll()
 
 void PlayScene::start()
 {
+	// setup default heuristic
+	m_heuristic = MANHATTAN;
+	m_manhattanButtonColour = ImVec4(0.26f, 1.0f, 0.98f, 0.40f);
+	m_euclideanButtonColour = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
+	
 	m_buildGrid();
 	m_mapTiles();
 

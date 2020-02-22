@@ -3,12 +3,15 @@
 #define __PLAY_SCENE__
 
 #include "Scene.h"
+#include "imgui.h"
 
 // Game Objects
 #include "Mine.h"
 #include "Planet.h"
 #include "ship.h"
 #include "Tile.h"
+#include "Heuristic.h"
+
 
 class PlayScene final : public Scene
 {
@@ -44,12 +47,13 @@ private:
 
 	void m_computeTileValues();
 
-	// pathfinding functions
+	// pathfinding functions & variables
 	Tile* m_findLowestCostTile(const std::vector<Tile*>& neighbours);
-
 	void m_findShortestPath();
 	std::vector<Tile*> m_openList;
 	std::vector<Tile*> m_closedList;
+	Heuristic m_heuristic;
+	void m_selectHeuristic(Heuristic heuristic);
 
 	glm::vec2 m_mousePosition;
 
@@ -62,6 +66,10 @@ private:
 	bool m_exitApp = false;
 	bool m_displayAbout = false;
 	bool m_displayUI = true;
+
+	// ImGui button variables
+	ImVec4 m_manhattanButtonColour;
+	ImVec4 m_euclideanButtonColour;
 	
 	void m_resetAll();
 

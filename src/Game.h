@@ -27,7 +27,6 @@ class Game
 {
 public:
 	
-
 	static Game* Instance()
 	{
 		if (s_pInstance == nullptr)
