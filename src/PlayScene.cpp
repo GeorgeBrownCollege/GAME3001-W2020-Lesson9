@@ -14,11 +14,12 @@
 
 void PlayScene::m_buildMines()
 {
-	for (int index = 0; index < m_mineNum; ++index)
+	for (auto index = 0; index < m_mineNum; ++index)
 	{
 		auto mine = new Mine();
 		addChild(mine);
 		m_mines.push_back(mine);
+		mine = nullptr;
 	}
 }
 
@@ -54,8 +55,9 @@ void PlayScene::m_spawnMines()
 		m_mines[i]->getTile()->setTileState(IMPASSABLE);
 	}
 
-	// first pass
+	// single pass
 	m_minePassAdjustment();
+	
 }
 
 /*
@@ -280,9 +282,9 @@ void PlayScene::m_findShortestPath(Tile* start_tile)
 		if(start_tile->getTileState() == NO_PATH)
 		{
 			std::cout << "Dead end - find another path" << std::endl;
-			m_resetGrid();
-			m_findShortestPath(start_tile);
-			//std::cout << "No Path found" << std::endl;
+			//m_resetGrid();
+			//m_findShortestPath(start_tile);
+			std::cout << "No Path found" << std::endl;
 			break;
 		}
 		
