@@ -30,7 +30,9 @@ public:
 	static float RandomRange(float min, float max);
 	static float Sanitize(float value);
 	static glm::vec2 min(glm::vec2 vecA, glm::vec2 vecB);
+	static float min(float a, float b);
 	static glm::vec2 max(glm::vec2 vecA, glm::vec2 vecB);
+	static float max(float a, float b);
 	static glm::vec2 negate(glm::vec2 vec);
 	static glm::vec2 inverse(glm::vec2 vec);
 	static glm::vec2 normalize(glm::vec2 vec);
@@ -38,4 +40,8 @@ public:
 	static float dot(glm::vec2 lhs, glm::vec2 rhs);
 
 };
+
+
+
+
 #endif /* defined (__UTIL__) */

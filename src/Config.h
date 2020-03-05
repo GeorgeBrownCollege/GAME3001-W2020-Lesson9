@@ -11,6 +11,7 @@ public:
 	static const int COL_NUM = 20;
 	static const int TILE_SIZE = 40;
 	static const int TILE_COST = 1;
+	static const int MINE_NUM = 50;
 
 	// Define Custom Deleters for shared_ptr types
 	static void SDL_DelRes(SDL_Window* r) { SDL_DestroyWindow(r); }

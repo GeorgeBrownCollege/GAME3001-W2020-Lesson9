@@ -7,21 +7,105 @@
 #include "SceneState.h"
 #include "Util.h"
 #include "IMGUI_SDL/imgui_sdl.h"
+#include "TileComparators.h"
 
 
 // Pathfinding & Steering functions ***********************************************
+
+void PlayScene::m_buildMines()
+{
+	for (int index = 0; index < m_mineNum; ++index)
+	{
+		auto mine = new Mine();
+		addChild(mine);
+		m_mines.push_back(mine);
+	}
+}
+
+void PlayScene::m_eraseMines()
+{
+	for (auto mine : m_mines)
+	{
+		delete mine;
+		mine = nullptr;
+	}
+	m_mines.clear();
+	m_mines.resize(0);
+	m_mines.shrink_to_fit();
+}
+
+void PlayScene::m_resetImpassableTiles()
+{
+	for (auto tile : m_pGrid)
+	{
+		if(tile->getTileState() == IMPASSABLE)
+		{
+			tile->setTileState(UNVISITED);
+		}
+	}
+}
+
+void PlayScene::m_spawnMines()
+{
+	m_resetImpassableTiles();
+	for (int i = 0; i < m_mineNum; ++i)
+	{
+		m_spawnObject(m_mines[i]);
+		m_mines[i]->getTile()->setTileState(IMPASSABLE);
+	}
+
+	// first pass
+	m_minePassAdjustment();
+}
+
+/*
+ * This utility function checks for mines that create a dead end
+ * and set the middle tile to IMPASSABLE
+ */
+void PlayScene::m_minePassAdjustment()
+{
+	for (auto tile : m_pGrid)
+	{
+		auto mineCount = 0;
+		auto nullCount = 0;
+		auto neighbours = tile->getNeighbours();
+		
+		for (auto i = 0; i < 4; ++i)
+		{
+			if (neighbours[i] != nullptr)
+			{
+				if (neighbours[i]->getTileState() == IMPASSABLE)
+				{
+					mineCount++;
+				}
+			}
+			else
+			{
+				nullCount++;
+			}
+
+			if (mineCount + nullCount > 2)
+			{
+				if((tile->getTileState() != START) && (tile->getTileState() != GOAL))
+				{
+					tile->setTileState(IMPASSABLE);
+				}
+			}
+		}
+	}
+}
 
 void PlayScene::m_resetGrid()
 {
 		for (auto tile : m_openList)
 		{
-			tile->setTileState(UNDEFINED);
+			tile->setTileState(UNVISITED);
 			m_openList.pop_back();
 		}
 
 		for (auto tile : m_closedList)
 		{
-			tile->setTileState(UNDEFINED);
+			tile->setTileState(UNVISITED);
 			m_closedList.pop_back();
 		}
 }
@@ -40,7 +124,7 @@ void PlayScene::m_buildGrid()
 			auto tile = new Tile(glm::vec2(offset + size * col, offset + size * row), 
 				glm::vec2(col, row));
 			addChild(tile);
-			tile->setTileState(UNDEFINED);
+			tile->setTileState(UNVISITED);
 			m_pGrid.push_back(tile);
 		}
 	}
@@ -70,12 +154,12 @@ int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
 	{
 		randomTileIndex = int(Util::RandomRange(0, m_pGrid.size() - 1));
 		randomTile = m_pGrid[randomTileIndex];
-	} while (randomTile->getTileState() != UNDEFINED); // search for empty tile
+	} while (randomTile->getTileState() != UNVISITED); // search for empty tile
 
 
 	if (object->getTile() != nullptr)
 	{
-		object->getTile()->setTileState(UNDEFINED);
+		object->getTile()->setTileState(UNVISITED);
 	}
 
 	object->setPosition(randomTile->getPosition());
@@ -86,27 +170,15 @@ int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
 
 void PlayScene::m_spawnShip()
 {
-	if(m_pShip->getTile() != nullptr)
-	{
-		m_pShip->getTile()->setTileState(UNDEFINED);
-	}
-	
-	const auto randomTileIndex = m_spawnObject(m_pShip);
-	m_pGrid[randomTileIndex]->setTileState(START);
+	m_spawnObject(m_pShip);
+	m_pShip->getTile()->setTileState(START);
 }
 
 void PlayScene::m_spawnPlanet()
 {
-	if(m_pPlanet->getTile() != nullptr)
-	{
-		m_pPlanet->getTile()->setTileState(UNDEFINED);
-	}
-	
-	const auto randomTileIndex = m_spawnObject(m_pPlanet);
-	auto tile = m_pGrid[randomTileIndex];
+	m_spawnObject(m_pPlanet);
 	m_computeTileValues();
-	tile->setTileState(GOAL);
-	
+	m_pPlanet->getTile()->setTileState(GOAL);
 }
 
 void PlayScene::m_computeTileValues()
@@ -118,43 +190,79 @@ void PlayScene::m_computeTileValues()
 	}
 }
 
-Tile* PlayScene::m_findLowestCostTile(const std::vector<Tile*>& neighbours)
+Tile* PlayScene::m_findLowestCostTile(Tile* current_tile)
 {
 	Tile* minTile = nullptr;
 	auto min = INFINITY;
+	int tile_num = 0;
+
+	std::vector<Tile*> adjacent = current_tile->getNeighbours();
+
+	std::cout << "+-- New Tile ------------------->" << std::endl;
+	std::cout << "+-                             ->" << std::endl;
 	
-	// for every tile in the neighbours vector
-	for (auto tile : neighbours)
+	current_tile->displayTile();
+
+	std::cout << "+-- Selecting Minimum Tile ----->" << std::endl;
+	std::cout << "+------------------------------->" << std::endl;
+	
+	for (int i = 0; i < 4; ++i)
 	{
-		// ensure the tile you are inspecting is not a nullptr
-		if (tile != nullptr)
+		if(adjacent[i] != nullptr)
 		{
-			// find the minimum value
-			if (min > tile->getTileValue())
+			if(adjacent[i]->getTileState() == GOAL)
 			{
-				min = tile->getTileValue();
-				minTile = tile;
+				minTile = adjacent[i];
+				return minTile;
+			}
+
+			if (adjacent[i]->getTileState() == UNVISITED)
+			{
+				if (min > adjacent[i]->getTileValue())
+				{
+					min = adjacent[i]->getTileValue();
+					minTile = adjacent[i];
+
+					if (minTile->getTileState() == GOAL)
+					{
+						return minTile;
+					}
+				}
 			}
 		}
 	}
 
-	// now for every tile in the neighbours vector
-	for (auto tile : neighbours)
+	if(min == INFINITY)
 	{
-		// check if the tile is not a nullptr and make sure it is only undefined
-		if ((tile != nullptr) && (tile->getTileState() == UNDEFINED))
+		std::cout << "+-- No Min Found ---- Return --->" << std::endl;
+		std::cout << "+------------------------------->" << std::endl;
+		current_tile->setTileState(NO_PATH);
+		return current_tile;
+	}
+
+	std::cout << "+------------------------------->" << std::endl;
+	std::cout << "+- Minimum value is: " << min << " ------>" << std::endl;
+	std::cout << "+------------------------------->" << std::endl;
+	std::cout << "+- Marking Tiles --------------->" << std::endl;
+	std::cout << "+------------------------------->" << std::endl;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		if ((adjacent[i] != nullptr) && (adjacent[i]->getTileState() != IMPASSABLE))
 		{
-			// mark the minimum tile as open and add it to the open list
-			if (tile == minTile)
+			if (minTile == adjacent[i])
 			{
-				tile->setTileState(OPEN);
-				m_openList.push_back(tile);
+				adjacent[i]->setTileState(OPEN);
+				m_openList.push_back(adjacent[i]);
 			}
-			// mark the other tiles as closed and add them to the closed list
 			else
 			{
-				tile->setTileState(CLOSED);
-				m_closedList.push_back(tile);
+				if (adjacent[i]->getTileState() == UNVISITED)
+				{
+					adjacent[i]->setTileState(CLOSED);
+					m_closedList.push_back(adjacent[i]);
+				}
+				
 			}
 		}
 	}
@@ -162,17 +270,30 @@ Tile* PlayScene::m_findLowestCostTile(const std::vector<Tile*>& neighbours)
 	return minTile;
 }
 
-void PlayScene::m_findShortestPath()
+void PlayScene::m_findShortestPath(Tile* start_tile)
 {
-	
-	auto tile = m_pShip->getTile();
+	auto pathLength = 0;
 
-	while(tile->getTileState() != GOAL)
+	while(start_tile->getTileState() != GOAL)
 	{
-		const auto neighbours = tile->getNeighbours();
-
-		tile = m_findLowestCostTile(neighbours);
+		start_tile = m_findLowestCostTile(start_tile);
+		if(start_tile->getTileState() == NO_PATH)
+		{
+			std::cout << "Dead end - find another path" << std::endl;
+			m_resetGrid();
+			m_findShortestPath(start_tile);
+			//std::cout << "No Path found" << std::endl;
+			break;
+		}
+		
+		if(pathLength > Config::COL_NUM + Config::ROW_NUM)
+		{
+			std::cout << "No Path found" << std::endl;
+			break;
+		}
+		pathLength++;
 	}
+	std::cout << "Path Length: " << pathLength << std::endl;
 }
 
 void PlayScene::m_selectHeuristic(Heuristic heuristic)
@@ -185,7 +306,7 @@ void PlayScene::m_selectHeuristic(Heuristic heuristic)
 	m_computeTileValues();
 	start->setTileState(START);
 	goal->setTileState(GOAL);
-	m_findShortestPath();
+	m_findShortestPath(m_pShip->getTile());
 
 	// change button colour depending on heuristic chosen
 	switch(heuristic)
@@ -203,8 +324,6 @@ void PlayScene::m_selectHeuristic(Heuristic heuristic)
 }
 
 // ImGui functions ***********************************************
-
-
 
 void PlayScene::m_ImGuiKeyMap()
 {
@@ -344,9 +463,16 @@ void PlayScene::m_updateUI()
 
 	ImGui::SameLine();
 
+	if (ImGui::Button("Respawn Mines"))
+	{
+		m_spawnMines();
+	}
+
+	ImGui::SameLine();
+
 	if (ImGui::Button("Find Shortest Path"))
 	{
-		m_findShortestPath();
+		m_findShortestPath(m_pShip->getTile());
 	}
 
 	if(ImGui::CollapsingHeader("Heuristic Options"))
@@ -367,6 +493,30 @@ void PlayScene::m_updateUI()
 		}
 		ImGui::PopStyleColor();
 	}
+
+	if(ImGui::SliderInt("Number of Mines", &m_mineNum, 1, 298))
+	{
+		m_eraseMines();
+		m_buildMines();
+		m_spawnMines();
+	}
+
+	if(ImGui::CollapsingHeader("Visibility Options"))
+	{
+		if(ImGui::Checkbox("Ship", &m_shipVisible))
+		{ }
+		ImGui::SameLine();
+
+		if (ImGui::Checkbox("Planet", &m_planetVisible))
+		{
+		}
+		ImGui::SameLine();
+
+		if (ImGui::Checkbox("Mines", &m_minesVisible))
+		{
+		}
+		
+	}
 	
 
 	// Main Window End
@@ -381,7 +531,7 @@ void PlayScene::m_resetAll()
 
 void PlayScene::start()
 {
-	// setup default heuristic
+	// setup default heuristic options
 	m_heuristic = MANHATTAN;
 	m_manhattanButtonColour = ImVec4(0.26f, 1.0f, 0.98f, 0.40f);
 	m_euclideanButtonColour = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
@@ -392,14 +542,15 @@ void PlayScene::start()
 	// instantiate planet and add it to the DisplayList
 	m_pPlanet = new Planet();
 	addChild(m_pPlanet);
-
 	m_spawnPlanet();
 	
 	// instantiate ship and add it to the DisplayList
 	m_pShip = new Ship();
 	addChild(m_pShip);
-
 	m_spawnShip();
+
+	m_buildMines();
+	m_spawnMines();
 }
 
 PlayScene::PlayScene()
@@ -420,9 +571,23 @@ void PlayScene::draw()
 		}
 	}
 
-	m_pPlanet->draw();
+	if(m_planetVisible)
+	{
+		m_pPlanet->draw();
+	}
 	
-	m_pShip->draw();
+	if(m_shipVisible)
+	{
+		m_pShip->draw();
+	}
+
+	if(m_minesVisible)
+	{
+		for (auto mine : m_mines)
+		{
+			mine->draw();
+		}
+	}
 	
 
 	// ImGui Rendering section - DO NOT MOVE OR DELETE
@@ -520,10 +685,10 @@ void PlayScene::handleEvents()
 				m_displayUI = (m_displayUI) ? false : true;
 				break;
 			case SDLK_f:
-				m_findShortestPath();
+				m_findShortestPath(m_pShip->getTile());
 				break;
-			case SDLK_g:
-				
+			case SDLK_e:
+				m_spawnMines();
 				break;
 			case SDLK_m:
 				m_spawnShip();

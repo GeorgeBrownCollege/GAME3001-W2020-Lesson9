@@ -7,9 +7,18 @@
 class ComparatorByValue
 {
 public:
-	bool operator() (Tile * tileA, Tile * tileB)
+	bool operator() (Tile * tile_a, Tile * tile_b) const
 	{
-		return tileA->getTileValue() < tileB->getTileValue();
+		if(tile_a != nullptr)
+		{
+			if(tile_b != nullptr)
+			{
+				return tile_a->getTileValue() < tile_b->getTileValue();
+			}
+
+			return true;
+		}
+		return false;
 	}
 };
 

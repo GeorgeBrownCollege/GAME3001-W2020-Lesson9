@@ -35,7 +35,13 @@ private:
 	std::vector<Tile*> m_pGrid;
 
 	// mines
+	int m_mineNum = Config::MINE_NUM;
 	std::vector<Mine*> m_mines;
+	void m_buildMines();
+	void m_eraseMines();
+	void m_resetImpassableTiles();
+	void m_spawnMines();
+	void m_minePassAdjustment();
 
 	void m_resetGrid();
 	void m_buildGrid();
@@ -48,8 +54,8 @@ private:
 	void m_computeTileValues();
 
 	// pathfinding functions & variables
-	Tile* m_findLowestCostTile(const std::vector<Tile*>& neighbours);
-	void m_findShortestPath();
+	Tile* m_findLowestCostTile(Tile* current_tile);
+	void m_findShortestPath(Tile* start_tile);
 	std::vector<Tile*> m_openList;
 	std::vector<Tile*> m_closedList;
 	Heuristic m_heuristic;
@@ -70,6 +76,11 @@ private:
 	// ImGui button variables
 	ImVec4 m_manhattanButtonColour;
 	ImVec4 m_euclideanButtonColour;
+
+	// ImGui visibility variables
+	bool m_shipVisible = true;
+	bool m_planetVisible = true;
+	bool m_minesVisible = true;
 	
 	void m_resetAll();
 

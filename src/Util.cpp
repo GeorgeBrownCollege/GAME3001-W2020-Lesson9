@@ -184,6 +184,11 @@ glm::vec2 Util::min(const glm::vec2 vecA, const glm::vec2 vecB)
 	return dest;
 }
 
+float Util::min(float a, float b)
+{
+	return a < b ? a : b;
+}
+
 /**
 * This method computes the maximum values of x and y from vecA and vecB
 * and returns the result in dest or returns the result as a new vec2
@@ -195,6 +200,11 @@ glm::vec2 Util::max(const glm::vec2 vecA, const glm::vec2 vecB)
 	dest.x = glm::max(vecA.x, vecB.x);
 	dest.y = glm::max(vecA.y, vecB.y);
 	return dest;
+}
+
+float Util::max(float a, float b)
+{
+	return a > b ? a : b;
 }
 
 /**

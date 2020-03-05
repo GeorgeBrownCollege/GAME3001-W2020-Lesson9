@@ -107,6 +107,9 @@ void Tile::setTileState(const TileState state)
 
 	switch(state)
 	{
+	case NO_PATH:
+		setTileStateLabel("N");
+		break;
 	case OPEN:
 		setTileStateLabel("O");
 		break;
@@ -120,8 +123,11 @@ void Tile::setTileState(const TileState state)
 		setTileStateLabel("G");
 		m_tileValue = 0;
 		break;
-	case UNDEFINED:
+	case UNVISITED:
 		setTileStateLabel("-");
+		break;
+	case IMPASSABLE:
+		setTileStateLabel("I");
 		break;
 	default:
 		std::cout << "a state that has not been defined" << std::endl;
@@ -146,6 +152,17 @@ void Tile::setTargetDistance(const glm::vec2 goal_location)
 	// declare heuristic;
 	auto h = 0.0f;
 
+	// manhattan nudge
+	const auto manhattanOffset = Util::min(abs(getGridPosition().x - goal_location.x), 
+													 abs(getGridPosition().y - goal_location.y)) * 0.1f;
+
+	// euclidean nudge
+	const auto euclideanOffset = Util::distance(getGridPosition(), goal_location) * 0.1f;
+
+	// overall nudge for tie breaking
+	const auto offset = Util::min(manhattanOffset, euclideanOffset);
+	
+
 	switch(m_heuristic)
 	{
 		case EUCLIDEAN:
@@ -163,7 +180,7 @@ void Tile::setTargetDistance(const glm::vec2 goal_location)
 
 	const float g = Config::TILE_COST;
 	
-	m_tileValue = g + h;
+	m_tileValue = g + h + offset;
 
 	std::ostringstream tempLabel;
 	tempLabel << std::fixed << std::setprecision(1) << m_tileValue;
@@ -182,6 +199,11 @@ float Tile::getTileValue() const
 	return m_tileValue;
 }
 
+void Tile::setTileValue(const float new_value)
+{
+	m_tileValue = new_value;
+}
+
 void Tile::setTileStateLabel(const std::string& closed_open) const
 {
 	m_pClosedOpenLabel->setText(closed_open);
@@ -198,4 +220,79 @@ std::vector<Tile*> Tile::getNeighbours() const
 void Tile::setHeuristic(const Heuristic heuristic)
 {
 	m_heuristic = heuristic;
+}
+
+void Tile::displayTile()
+{
+	std::cout << "+------------------------------->" << std::endl;
+	std::cout << "+-                             ->" << std::endl;
+	
+	if(getUp() != nullptr)
+	{
+		if(getUp()->getTileState() != IMPASSABLE)
+		{
+			std::cout << "+-         U: " << getUp()->getTileValue() << "             ->" << std::endl;
+		}
+		else
+		{
+			std::cout << "+-         U: mine             ->" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "+-         U: nptr             ->" << std::endl;
+	}
+
+	if(getLeft() != nullptr)
+	{
+		if (getLeft()->getTileState() != IMPASSABLE)
+		{
+			std::cout << "+- L: " << getLeft()->getTileValue();
+		}
+		else
+		{
+			std::cout << "+- L: mine";
+		}
+	}
+	else
+	{
+		std::cout << "+- L: nptr";
+	}
+	
+	std::cout << " T: " << getTileValue();
+
+	if(getRight() != nullptr)
+	{
+		if (getRight()->getTileState() != IMPASSABLE)
+		{
+			std::cout << " R: " << getRight()->getTileValue() << "     ->" << std::endl;
+		}
+		else
+		{
+			std::cout << " R: mine    ->" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << " R: nptr    ->" << std::endl;
+	}
+
+	if(getDown() != nullptr)
+	{
+		if (getDown()->getTileState() != IMPASSABLE)
+		{
+			std::cout << "+-         D: " << getDown()->getTileValue() << "             ->" << std::endl;
+		}
+		else
+		{
+			std::cout << "+-         D: mine             ->" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "+-         D: nptr             ->" << std::endl;
+	}
+	
+	std::cout << "+-                             ->" << std::endl;
+	std::cout << "+------------------------------->" << std::endl;
 }

@@ -45,12 +45,15 @@ public:
 	glm::vec2 getGridPosition() const;
 
 	float getTileValue() const;
+	void setTileValue(float new_value);
 
 	void setTileStateLabel(const std::string& closed_open) const;
 
 	std::vector<Tile*> getNeighbours() const;
 
 	void setHeuristic(Heuristic heuristic);
+
+	void displayTile();
 
 private:
 	float m_cost = Config::TILE_COST;

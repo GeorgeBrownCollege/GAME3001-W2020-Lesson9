@@ -15,8 +15,7 @@ Mine::Mine()
 }
 
 Mine::~Mine()
-{
-}
+= default;
 
 void Mine::draw()
 {
